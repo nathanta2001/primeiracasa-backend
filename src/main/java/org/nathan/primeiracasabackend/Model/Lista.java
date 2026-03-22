@@ -28,7 +28,7 @@ public class Lista implements Serializable {
 
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
-    @Column(name = "pk_lista")
+    @Column(name = "id_lista")
     private UUID id;
 
     //Como não faremos login não precisa da fk do usuario por enquanto

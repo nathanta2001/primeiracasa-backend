@@ -26,7 +26,7 @@ public class Produto implements Serializable{
 
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
-    @Column(name = "pk_produto")
+    @Column(name = "id_produto")
     private UUID id;
 
     @Column(name = "nome", nullable = false, length = 100)
