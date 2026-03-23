@@ -2,6 +2,7 @@ package org.nathan.primeiracasabackend.Service;
 
 
 import jakarta.transaction.Transactional;
+import org.nathan.primeiracasabackend.Exception.ResourceNotFoundException;
 import org.nathan.primeiracasabackend.Model.ItemCasa;
 import org.nathan.primeiracasabackend.Repository.ListaRepository;
 import org.nathan.primeiracasabackend.dto.request.ItemCasaRequestDTO;
@@ -27,7 +28,7 @@ public class ListaService {
     public ListaResponseDTO getLista(UUID id) {
 
         Lista lista = listaRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Lista inexistente"));
+                .orElseThrow(() -> new ResourceNotFoundException("Lista inexistente"));
 
         return converteParaResponse(lista);
     }
@@ -52,7 +53,7 @@ public class ListaService {
     @Transactional
     public ListaResponseDTO updateLista(UUID id, ListaRequestDTO ListaDto) {
         Lista lista = listaRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Lista inexistente"));
+                .orElseThrow(() -> new ResourceNotFoundException("Lista inexistente"));
         lista.setNome(ListaDto.getNome());
         return converteParaResponse(listaRepository.save(lista));
     }
@@ -60,7 +61,7 @@ public class ListaService {
     @Transactional
     public void deleteLista(UUID id){
         if(!listaRepository.existsById(id)){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Nenhuma lista encontrada com esse ID: "+ id);
+            throw new ResourceNotFoundException("Nenhuma lista encontrada com esse ID: "+ id);
         }
 
         listaRepository.deleteById(id);
