@@ -2,11 +2,9 @@ package org.nathan.primeiracasabackend.dto.request;
 
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.*;
 import lombok.*;
-import org.nathan.primeiracasabackend.Enums.EnumsItemCasa.ComodoItem;
-import org.nathan.primeiracasabackend.Enums.EnumsItemCasa.NecessidadeItem;
-import org.nathan.primeiracasabackend.Enums.EnumsItemCasa.TipoItem;
 import org.nathan.primeiracasabackend.Enums.EnumsProduto.CategoriaProduto;
 import org.nathan.primeiracasabackend.Enums.EnumsProduto.StatusProduto;
 
@@ -19,8 +17,9 @@ import java.util.UUID;
 @Builder
 public class ProdutoRequestDTO {
 
+    @JsonProperty("idLista")
     @NotNull(message = "A lista é obrigatória")
-    private UUID Idlista;
+    private UUID idLista;
 
     @NotBlank(message = "o nome do item é obrigatório")
     @Size(max = 100)
