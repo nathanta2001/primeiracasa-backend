@@ -1,16 +1,20 @@
 package org.nathan.primeiracasabackend.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
 import jakarta.transaction.Transactional;
+import org.nathan.primeiracasabackend.Enums.EnumsItemCasa.ComodoItem;
+import org.nathan.primeiracasabackend.Enums.EnumsItemCasa.NecessidadeItem;
+import org.nathan.primeiracasabackend.Enums.EnumsItemCasa.TipoItem;
+import org.nathan.primeiracasabackend.Exception.ResourceNotFoundException;
 import org.nathan.primeiracasabackend.Repository.ItemCasaRepository;
+import org.nathan.primeiracasabackend.Specification.ItemCasaSpecification;
 import org.nathan.primeiracasabackend.dto.request.ItemCasaRequestDTO;
 import org.nathan.primeiracasabackend.dto.response.ItemCasaResponseDTO;
-import org.springframework.http.HttpStatus;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 import org.nathan.primeiracasabackend.Model.ItemCasa;
 import lombok.RequiredArgsConstructor;
 
@@ -22,7 +26,7 @@ public class ItemCasaService {
 
     public ItemCasaResponseDTO getItemCasa(UUID id){
         ItemCasa itemCasa = itemCasaRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Item inexistente"));
+                .orElseThrow(() -> new ResourceNotFoundException("Item inexistente"));
 
         return converteParaResponse(itemCasa);
     }
@@ -51,7 +55,7 @@ public class ItemCasaService {
     @Transactional
     public ItemCasaResponseDTO updateItemCasa(UUID id, ItemCasaRequestDTO dto) {
         ItemCasa itemCasa = itemCasaRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Item inexistente"));
+                .orElseThrow(() -> new ResourceNotFoundException("Item inexistente"));
         itemCasa.setNome(dto.getNome());
         itemCasa.setPreco(dto.getPreco());
         itemCasa.setTipo(dto.getTipo());
@@ -63,7 +67,7 @@ public class ItemCasaService {
     @Transactional
     public void deleteItemCasa(UUID id){
         if(!itemCasaRepository.existsById(id)){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Nenhum Item encontrado com esse ID: "+ id);
+            throw new ResourceNotFoundException("Nenhum Item encontrado com esse ID: "+ id);
         }
 
         itemCasaRepository.deleteById(id);
@@ -78,5 +82,28 @@ public class ItemCasaService {
                 .necessidade(itemCasa.getNecessidade())
                 .comodo(itemCasa.getComodo())
                 .build();
+    }
+
+
+    public List<ItemCasaResponseDTO> filtrar(
+            String nome,
+            ComodoItem comodo,
+            TipoItem tipo,
+            NecessidadeItem necessidade,
+            BigDecimal precoMin,
+            BigDecimal precoMax) {
+
+        Specification<ItemCasa> spec = Specification
+                .where(ItemCasaSpecification.porNome(nome))
+                .and(ItemCasaSpecification.porComodo(comodo))
+                .and(ItemCasaSpecification.porTipo(tipo))
+                .and(ItemCasaSpecification.porNecessidade(necessidade))
+                .and(ItemCasaSpecification.porPrecoMinimo(precoMin))
+                .and(ItemCasaSpecification.porPrecoMaximo(precoMax));
+
+        return itemCasaRepository.findAll(spec)
+                .stream()
+                .map(this::converteParaResponse)
+                .toList();
     }
 }
