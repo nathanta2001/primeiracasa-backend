@@ -3,6 +3,7 @@ package org.nathan.primeiracasabackend.Controller;
 import java.util.List;
 import java.util.UUID;
 
+import jakarta.validation.Valid;
 import org.nathan.primeiracasabackend.Service.ListaService;
 import org.nathan.primeiracasabackend.dto.request.ListaRequestDTO;
 import org.nathan.primeiracasabackend.dto.response.ListaResponseDTO;
@@ -29,12 +30,12 @@ public class ListaController {
     }
 
     @PostMapping("")
-    public ResponseEntity<ListaResponseDTO> insertLista(@RequestBody ListaRequestDTO listaRequestDTO){
+    public ResponseEntity<ListaResponseDTO> insertLista(@RequestBody @Valid ListaRequestDTO listaRequestDTO){
         return ResponseEntity.status(HttpStatus.CREATED).body(listaService.insertLista(listaRequestDTO));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ListaResponseDTO> updateLista(@PathVariable UUID id, @RequestBody ListaRequestDTO listaRequestDTO){
+    public ResponseEntity<ListaResponseDTO> updateLista(@PathVariable UUID id, @RequestBody @Valid ListaRequestDTO listaRequestDTO){
         return ResponseEntity.ok(listaService.updateLista(id, listaRequestDTO));
     }
 

@@ -3,6 +3,7 @@ package org.nathan.primeiracasabackend.Controller;
 import java.util.List;
 import java.util.UUID;
 
+import jakarta.validation.Valid;
 import org.nathan.primeiracasabackend.Service.ProdutoService;
 import org.nathan.primeiracasabackend.dto.request.ProdutoRequestDTO;
 import org.nathan.primeiracasabackend.dto.response.ProdutoResponseDTO;
@@ -29,12 +30,12 @@ public class ProdutoController {
     }
 
     @PostMapping("")
-    public ResponseEntity<ProdutoResponseDTO> insertProduto(@RequestBody ProdutoRequestDTO produtoRequestDTO){
+    public ResponseEntity<ProdutoResponseDTO> insertProduto(@RequestBody @Valid ProdutoRequestDTO produtoRequestDTO){
         return ResponseEntity.status(HttpStatus.CREATED).body(produtoService.insertProduto(produtoRequestDTO));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ProdutoResponseDTO> updateProduto(@PathVariable UUID id, @RequestBody ProdutoRequestDTO produtoRequestDTO){
+    public ResponseEntity<ProdutoResponseDTO> updateProduto(@PathVariable("id") UUID id, @RequestBody @Valid ProdutoRequestDTO produtoRequestDTO){
         return ResponseEntity.ok(produtoService.updateProduto(id, produtoRequestDTO));
     }
 
