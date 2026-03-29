@@ -73,6 +73,20 @@ public class ItemCasaService {
         itemCasaRepository.deleteById(id);
     }
 
+    @Transactional
+    public ItemCasaResponseDTO salvarFoto(UUID id, String fotoBase64){
+        ItemCasa itemCasa = itemCasaRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Produto inexistente"));
+
+        if(fotoBase64 != null && fotoBase64.startsWith("data:image")){
+            itemCasa.setFotoBase64(fotoBase64);
+            itemCasaRepository.save(itemCasa);
+        } else{
+            throw new IllegalArgumentException("Formato de imagem invalido");
+        }
+        return converteParaResponse(itemCasaRepository.save(itemCasa));
+    }
+
     private ItemCasaResponseDTO converteParaResponse(ItemCasa itemCasa){
         return ItemCasaResponseDTO.builder()
                 .id(itemCasa.getId())
@@ -81,6 +95,7 @@ public class ItemCasaService {
                 .tipo(itemCasa.getTipo())
                 .necessidade(itemCasa.getNecessidade())
                 .comodo(itemCasa.getComodo())
+                .fotoBase64(itemCasa.getFotoBase64())
                 .build();
     }
 

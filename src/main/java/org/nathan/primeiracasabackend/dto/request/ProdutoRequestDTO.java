@@ -30,4 +30,6 @@ public class ProdutoRequestDTO {
 
     @NotNull(message = "O status é obrigatório")
     private StatusProduto status;
+
+    private String fotoBase64;
 }

@@ -44,4 +44,7 @@ public class ItemCasa implements Serializable{
     @Column(name = "comodo", nullable = false)
     @Enumerated(EnumType.STRING)
     private ComodoItem comodo;
+
+    @Column(columnDefinition = "TEXT")
+    private String fotoBase64;
 }

@@ -76,6 +76,20 @@ public class ProdutoService {
         produtoRepository.deleteById(id);
     }
 
+    @Transactional
+    public ProdutoResponseDTO salvarFoto(UUID id, String fotoBase64){
+        Produto produto = produtoRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Produto inexistente"));
+
+        if(fotoBase64 != null && fotoBase64.startsWith("data:image")){
+            produto.setFotoBase64(fotoBase64);
+            produtoRepository.save(produto);
+        } else{
+            throw new IllegalArgumentException("Formato de imagem invalido");
+        }
+        return converteParaResponse(produtoRepository.save(produto));
+    }
+
     private ProdutoResponseDTO converteParaResponse(Produto produto){
         return ProdutoResponseDTO.builder()
                 .id(produto.getId())
@@ -83,6 +97,7 @@ public class ProdutoService {
                 .categoria(produto.getCategoria())
                 .status(produto.getStatus())
                 .idLista(produto.getLista().getId())
+                .fotoBase64(produto.getFotoBase64())
                 .build();
     }
 

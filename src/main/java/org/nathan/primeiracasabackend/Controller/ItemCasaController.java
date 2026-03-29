@@ -49,6 +49,11 @@ public class ItemCasaController {
         return ResponseEntity.noContent().build();
     }
 
+    @PatchMapping("/{id}/foto") // Patch é usado para atualizações parciais
+    public ResponseEntity<ItemCasaResponseDTO> atualizarFoto(@PathVariable UUID id, @RequestBody String fotoBase64) {
+        return ResponseEntity.ok(itemCasaService.salvarFoto(id, fotoBase64));
+    }
+
     @GetMapping("/filtrar")
     public ResponseEntity<List<ItemCasaResponseDTO>> filtrar(
             @RequestParam(required = false) String nome,

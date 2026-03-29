@@ -39,6 +39,11 @@ public class ProdutoController {
         return ResponseEntity.ok(produtoService.updateProduto(id, produtoRequestDTO));
     }
 
+    @PatchMapping("/{id}/foto") // Patch é usado para atualizações parciais
+    public ResponseEntity<ProdutoResponseDTO> atualizarFoto(@PathVariable UUID id, @RequestBody String fotoBase64) {
+        return ResponseEntity.ok(produtoService.salvarFoto(id, fotoBase64));
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProduto(@PathVariable UUID id){
         produtoService.deleteProduto(id);

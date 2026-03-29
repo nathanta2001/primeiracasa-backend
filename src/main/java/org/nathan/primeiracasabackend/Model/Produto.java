@@ -40,4 +40,7 @@ public class Produto implements Serializable{
     @Enumerated(EnumType.STRING)
     private StatusProduto status;
 
+    @Column(columnDefinition = "TEXT")
+    private String fotoBase64;
+
 }

@@ -21,4 +21,5 @@ public class ItemCasaResponseDTO {
     private TipoItem tipo;
     private NecessidadeItem necessidade;
     private ComodoItem comodo;
+    private String fotoBase64;
 }
