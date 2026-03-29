@@ -18,5 +18,7 @@ public class ProdutoResponseDTO {
     private String nome;
     private CategoriaProduto categoria;
     private StatusProduto status;
+    private UUID idLista;
+    private String fotoBase64;
 
 }

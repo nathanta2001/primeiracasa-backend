@@ -14,7 +14,6 @@ import java.util.UUID;
 @Repository
 public interface ListaRepository extends JpaRepository<Lista, UUID> {
 
-    List<Produto> findByLista(Lista lista);
     List<Lista> findByNomeContaining(String nome);
 
     boolean existsByNomeContaining(String nome);

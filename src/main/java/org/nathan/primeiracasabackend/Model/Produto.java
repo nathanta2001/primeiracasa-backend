@@ -26,7 +26,7 @@ public class Produto implements Serializable{
 
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
-    @Column(name = "pk_produto")
+    @Column(name = "id_produto")
     private UUID id;
 
     @Column(name = "nome", nullable = false, length = 100)
@@ -39,5 +39,8 @@ public class Produto implements Serializable{
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
     private StatusProduto status;
+
+    @Column(columnDefinition = "TEXT")
+    private String fotoBase64;
 
 }

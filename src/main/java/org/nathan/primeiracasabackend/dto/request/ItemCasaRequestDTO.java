@@ -32,4 +32,6 @@ public class ItemCasaRequestDTO {
     @NotNull(message = "O comodo é obrigatório")
     private ComodoItem comodo;
 
+    private String fotoBase64;
+
 }

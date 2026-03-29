@@ -6,7 +6,6 @@ import lombok.*;
 import org.nathan.primeiracasabackend.Enums.EnumsItemCasa.ComodoItem;
 import org.nathan.primeiracasabackend.Enums.EnumsItemCasa.NecessidadeItem;
 import org.nathan.primeiracasabackend.Enums.EnumsItemCasa.TipoItem;
-
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -25,7 +24,7 @@ public class ItemCasa implements Serializable{
 
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
-    @Column(name = "pk_item")
+    @Column(name = "id_item")
     private UUID id;
 
     @Column(name = "nome", nullable = false, length = 100)
@@ -45,4 +44,7 @@ public class ItemCasa implements Serializable{
     @Column(name = "comodo", nullable = false)
     @Enumerated(EnumType.STRING)
     private ComodoItem comodo;
+
+    @Column(columnDefinition = "TEXT")
+    private String fotoBase64;
 }
