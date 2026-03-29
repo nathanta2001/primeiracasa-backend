@@ -82,6 +82,7 @@ public class ProdutoService {
                 .nome(produto.getNome())
                 .categoria(produto.getCategoria())
                 .status(produto.getStatus())
+                .idLista(produto.getLista().getId())
                 .build();
     }
 
