@@ -1,4 +1,4 @@
-package org.nathan.primeiracasabackend.config;
+package org.nathan.primeiracasabackend.Config;
 
 
 import org.springframework.context.annotation.Configuration;
@@ -11,7 +11,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("http://localhost:5173")// mudar pra url real quando subir pra nuvem
+                .allowedOrigins("http://localhost:5173", "http://localhost:4173")// mudar pra url real quando subir pra nuvem
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
                 .allowCredentials(true)
