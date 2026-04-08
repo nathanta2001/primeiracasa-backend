@@ -46,6 +46,7 @@ public class ItemCasaService {
                 .tipo(itemCasaDto.getTipo())
                 .necessidade(itemCasaDto.getNecessidade())
                 .comodo(itemCasaDto.getComodo())
+                .fotoBase64(itemCasaDto.getFotoBase64())
                 .build();
 
         ItemCasa salvo = itemCasaRepository.save(itemCasa);
@@ -61,6 +62,7 @@ public class ItemCasaService {
         itemCasa.setTipo(dto.getTipo());
         itemCasa.setNecessidade(dto.getNecessidade());
         itemCasa.setComodo(dto.getComodo());
+        itemCasa.setFotoBase64(dto.getFotoBase64());
         return converteParaResponse(itemCasaRepository.save(itemCasa));
     }
 

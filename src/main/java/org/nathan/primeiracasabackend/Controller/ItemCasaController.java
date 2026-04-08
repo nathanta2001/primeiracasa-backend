@@ -2,6 +2,7 @@ package org.nathan.primeiracasabackend.Controller;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import jakarta.validation.Valid;
@@ -49,9 +50,10 @@ public class ItemCasaController {
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping("/{id}/foto") // Patch é usado para atualizações parciais
-    public ResponseEntity<ItemCasaResponseDTO> atualizarFoto(@PathVariable UUID id, @RequestBody String fotoBase64) {
-        return ResponseEntity.ok(itemCasaService.salvarFoto(id, fotoBase64));
+    @PatchMapping("/{id}/foto")
+    public ResponseEntity<ItemCasaResponseDTO> atualizarFoto(@PathVariable UUID id, @RequestBody Map<String, String> payload) {
+        String foto = payload.get("foto");
+        return ResponseEntity.ok(itemCasaService.salvarFoto(id, foto));
     }
 
     @GetMapping("/filtrar")

@@ -31,10 +31,6 @@ public class Lista implements Serializable {
     @Column(name = "id_lista")
     private UUID id;
 
-    //Como não faremos login não precisa da fk do usuario por enquanto
-//    @GeneratedValue(strategy= GenerationType.AUTO)
-//    @Column(name = "fk_user")
-//    private UUID id_user;
 
     @Column(name = "nome", nullable = false, length = 100)
     private String nome;
