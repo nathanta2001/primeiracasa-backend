@@ -46,6 +46,7 @@ public class ProdutoService {
                 .categoria(produtoDto.getCategoria())
                 .status(produtoDto.getStatus())
                 .lista(lista)
+                .fotoBase64(produtoDto.getFotoBase64())
                 .build();
 
         Produto salvo = produtoRepository.save(produto);
@@ -64,6 +65,7 @@ public class ProdutoService {
         produto.setCategoria(produtoDto.getCategoria());
         produto.setStatus(produtoDto.getStatus());
         produto.setLista(lista);
+        produto.setFotoBase64(produtoDto.getFotoBase64());
         return converteParaResponse(produtoRepository.save(produto));
     }
 

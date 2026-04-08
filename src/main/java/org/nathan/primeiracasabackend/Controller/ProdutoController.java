@@ -1,6 +1,7 @@
 package org.nathan.primeiracasabackend.Controller;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import jakarta.validation.Valid;
@@ -39,9 +40,10 @@ public class ProdutoController {
         return ResponseEntity.ok(produtoService.updateProduto(id, produtoRequestDTO));
     }
 
-    @PatchMapping("/{id}/foto") // Patch é usado para atualizações parciais
-    public ResponseEntity<ProdutoResponseDTO> atualizarFoto(@PathVariable UUID id, @RequestBody String fotoBase64) {
-        return ResponseEntity.ok(produtoService.salvarFoto(id, fotoBase64));
+    @PatchMapping("/{id}/foto")
+    public ResponseEntity<ProdutoResponseDTO> atualizarFoto(@PathVariable UUID id, @RequestBody Map<String, String> payload) {
+        String foto = payload.get("foto");
+        return ResponseEntity.ok(produtoService.salvarFoto(id, foto));
     }
 
     @DeleteMapping("/{id}")
