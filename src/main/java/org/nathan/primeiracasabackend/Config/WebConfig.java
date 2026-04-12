@@ -11,7 +11,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("https://primeiracasa-backend.onrender.com")// mudar pra url real quando subir pra nuvem
+                .allowedOrigins("https://primeiracasa-backend.onrender.com", "http://localhost:5173")// mudar pra url real quando subir pra nuvem
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
                 .allowCredentials(true)
