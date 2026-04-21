@@ -2,8 +2,6 @@ package org.nathan.primeiracasabackend.Repository;
 
 
 import org.nathan.primeiracasabackend.Enums.EnumsProduto.CategoriaProduto;
-import org.nathan.primeiracasabackend.Enums.EnumsProduto.StatusProduto;
-import org.nathan.primeiracasabackend.Model.Lista;
 import org.nathan.primeiracasabackend.Model.Produto;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

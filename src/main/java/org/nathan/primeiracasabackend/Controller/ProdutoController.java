@@ -1,7 +1,6 @@
 package org.nathan.primeiracasabackend.Controller;
 
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
