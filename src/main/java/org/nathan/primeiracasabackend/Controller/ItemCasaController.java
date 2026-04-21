@@ -2,9 +2,9 @@ package org.nathan.primeiracasabackend.Controller;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.nathan.primeiracasabackend.Enums.EnumsItemCasa.ComodoItem;
 import org.nathan.primeiracasabackend.Enums.EnumsItemCasa.NecessidadeItem;
@@ -20,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/itens")
 @RequiredArgsConstructor
+@SecurityRequirement(name = "bearerAuth")
 public class ItemCasaController {
 
     private final ItemCasaService itemCasaService;
@@ -48,12 +49,6 @@ public class ItemCasaController {
     public ResponseEntity<Void> deleteItemCasa(@PathVariable UUID id){
         itemCasaService.deleteItemCasa(id);
         return ResponseEntity.noContent().build();
-    }
-
-    @PatchMapping("/{id}/foto")
-    public ResponseEntity<ItemCasaResponseDTO> atualizarFoto(@PathVariable UUID id, @RequestBody Map<String, String> payload) {
-        String foto = payload.get("foto");
-        return ResponseEntity.ok(itemCasaService.salvarFoto(id, foto));
     }
 
     @GetMapping("/filtrar")

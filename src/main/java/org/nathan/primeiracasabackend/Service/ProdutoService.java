@@ -1,12 +1,13 @@
 package org.nathan.primeiracasabackend.Service;
 
+import org.springframework.security.access.AccessDeniedException;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import jakarta.transaction.Transactional;
 import org.nathan.primeiracasabackend.Exception.ResourceNotFoundException;
 import org.nathan.primeiracasabackend.Model.Lista;
+import org.nathan.primeiracasabackend.Model.Usuario;
 import org.nathan.primeiracasabackend.Repository.ListaRepository;
 import org.nathan.primeiracasabackend.Repository.ProdutoRepository;
 import org.nathan.primeiracasabackend.dto.request.ProdutoRequestDTO;
@@ -21,25 +22,33 @@ public class ProdutoService {
 
     private final ProdutoRepository produtoRepository;
     private final ListaRepository listaRepository;
+    private final AuthService authService;
 
-    public ProdutoResponseDTO getProduto(UUID id){
+
+    public List<ProdutoResponseDTO> getProdutoList() {
+        return produtoRepository.findByUsuarioId(authService.getUsuarioLogado().getId())
+                .stream()
+                .map(this::converteParaResponse)
+                .toList();
+    }
+
+    public ProdutoResponseDTO getProduto(UUID id) {
+        Usuario usuario = authService.getUsuarioLogado();
         Produto produto = produtoRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException( "Produto inexistente"));
+                .orElseThrow(() -> new ResourceNotFoundException("Produto não encontrado"));
+        if(!produto.getUsuario().getId().equals(usuario.getId())){
+            throw new AccessDeniedException("Você não tem permissão pra acessar esse produto");
+        }
 
         return converteParaResponse(produto);
     }
 
-    public List<ProdutoResponseDTO> getProdutoList(){
-        return produtoRepository.findAll()
-                .stream()
-                .map(this::converteParaResponse)
-                .collect(Collectors.toList());
-    }
-
     @Transactional
-    public ProdutoResponseDTO insertProduto(ProdutoRequestDTO produtoDto){
-        Lista lista = listaRepository.findById(produtoDto.getIdLista())
-                .orElseThrow(() -> new ResourceNotFoundException("Lista inexistente"));
+    public ProdutoResponseDTO insertProduto(ProdutoRequestDTO produtoDto) {
+        Usuario usuario = authService.getUsuarioLogado();
+
+        Lista lista = listaRepository.findByIdAndUsuarioId(produtoDto.getIdLista(), usuario.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Lista não encontrada ou acesso negado"));
 
         Produto produto = Produto.builder()
                 .nome(produtoDto.getNome())
@@ -47,52 +56,44 @@ public class ProdutoService {
                 .status(produtoDto.getStatus())
                 .lista(lista)
                 .fotoBase64(produtoDto.getFotoBase64())
+                .usuario(usuario)
                 .build();
 
-        Produto salvo = produtoRepository.save(produto);
-        return converteParaResponse(salvo);
+        return converteParaResponse(produtoRepository.save(produto));
     }
 
     @Transactional
     public ProdutoResponseDTO updateProduto(UUID id, ProdutoRequestDTO produtoDto) {
-        Produto produto = produtoRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Produto inexistente"));
+        Usuario usuario = authService.getUsuarioLogado();
 
-        Lista lista = listaRepository.findById(produtoDto.getIdLista())
-                .orElseThrow(() -> new ResourceNotFoundException("Lista inexistente"));
+        Produto produto = produtoRepository.findByIdAndUsuarioId(id, usuario.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Produto não encontrado ou acesso negado"));
+
+        Lista lista = listaRepository.findByIdAndUsuarioId(produtoDto.getIdLista(), usuario.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Lista de destino não encontrada"));
 
         produto.setNome(produtoDto.getNome());
         produto.setCategoria(produtoDto.getCategoria());
         produto.setStatus(produtoDto.getStatus());
         produto.setLista(lista);
         produto.setFotoBase64(produtoDto.getFotoBase64());
+
         return converteParaResponse(produtoRepository.save(produto));
     }
 
     @Transactional
-    public void deleteProduto(UUID id){
-        if(!produtoRepository.existsById(id)){
-            throw new ResourceNotFoundException("Nenhum Produto encontrado com esse ID: "+ id);
-        }
-
-        produtoRepository.deleteById(id);
-    }
-
-    @Transactional
-    public ProdutoResponseDTO salvarFoto(UUID id, String fotoBase64){
+    public void deleteProduto(UUID id) {
+        Usuario usuario = authService.getUsuarioLogado();
         Produto produto = produtoRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Produto inexistente"));
+                .orElseThrow(() -> new ResourceNotFoundException("Produto não encontrado"));
 
-        if(fotoBase64 != null && fotoBase64.startsWith("data:image")){
-            produto.setFotoBase64(fotoBase64);
-            produtoRepository.save(produto);
-        } else{
-            throw new IllegalArgumentException("Formato de imagem invalido");
+        if(!produto.getUsuario().getId().equals(usuario.getId())){
+            throw new AccessDeniedException("Você não tem permissão pra excluir esse produto");
         }
-        return converteParaResponse(produtoRepository.save(produto));
+        produtoRepository.delete(produto);
     }
 
-    private ProdutoResponseDTO converteParaResponse(Produto produto){
+    private ProdutoResponseDTO converteParaResponse(Produto produto) {
         return ProdutoResponseDTO.builder()
                 .id(produto.getId())
                 .nome(produto.getNome())
@@ -102,5 +103,4 @@ public class ProdutoService {
                 .fotoBase64(produto.getFotoBase64())
                 .build();
     }
-
 }

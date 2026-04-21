@@ -3,17 +3,18 @@ package org.nathan.primeiracasabackend.Service;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import jakarta.transaction.Transactional;
 import org.nathan.primeiracasabackend.Enums.EnumsItemCasa.ComodoItem;
 import org.nathan.primeiracasabackend.Enums.EnumsItemCasa.NecessidadeItem;
 import org.nathan.primeiracasabackend.Enums.EnumsItemCasa.TipoItem;
 import org.nathan.primeiracasabackend.Exception.ResourceNotFoundException;
+import org.nathan.primeiracasabackend.Model.Usuario;
 import org.nathan.primeiracasabackend.Repository.ItemCasaRepository;
 import org.nathan.primeiracasabackend.Specification.ItemCasaSpecification;
 import org.nathan.primeiracasabackend.dto.request.ItemCasaRequestDTO;
 import org.nathan.primeiracasabackend.dto.response.ItemCasaResponseDTO;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.nathan.primeiracasabackend.Model.ItemCasa;
 import lombok.RequiredArgsConstructor;
@@ -23,23 +24,31 @@ import lombok.RequiredArgsConstructor;
 public class ItemCasaService {
 
     private final ItemCasaRepository itemCasaRepository;
+    private final AuthService authService;
 
-    public ItemCasaResponseDTO getItemCasa(UUID id){
-        ItemCasa itemCasa = itemCasaRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Item inexistente"));
 
-        return converteParaResponse(itemCasa);
+    public List<ItemCasaResponseDTO> getItemCasasList() {
+        Usuario usuario = authService.getUsuarioLogado();
+        return itemCasaRepository.findByUsuarioId(usuario.getId()).stream()
+                .map(this::converteParaResponse)
+                .toList();
     }
 
-    public List<ItemCasaResponseDTO> getItemCasasList(){
-        return itemCasaRepository.findAll()
-                .stream()
-                .map(this::converteParaResponse)
-                .collect(Collectors.toList());
+    public ItemCasaResponseDTO getItemCasa(UUID id) {
+        Usuario usuario = authService.getUsuarioLogado();
+
+        ItemCasa item = itemCasaRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Item não encontrado"));
+
+        if (!item.getUsuario().getId().equals(usuario.getId())) {
+            throw new AccessDeniedException("Você não tem permissão para acessar este item");
+        }
+
+        return converteParaResponse(item);
     }
 
     @Transactional
-    public ItemCasaResponseDTO insertItemCasa(ItemCasaRequestDTO itemCasaDto){
+    public ItemCasaResponseDTO insertItemCasa(ItemCasaRequestDTO itemCasaDto) {
         ItemCasa itemCasa = ItemCasa.builder()
                 .nome(itemCasaDto.getNome())
                 .preco(itemCasaDto.getPreco())
@@ -47,49 +56,66 @@ public class ItemCasaService {
                 .necessidade(itemCasaDto.getNecessidade())
                 .comodo(itemCasaDto.getComodo())
                 .fotoBase64(itemCasaDto.getFotoBase64())
+                .usuario(authService.getUsuarioLogado())
                 .build();
 
-        ItemCasa salvo = itemCasaRepository.save(itemCasa);
-        return converteParaResponse(salvo);
+        return converteParaResponse(itemCasaRepository.save(itemCasa));
     }
 
     @Transactional
     public ItemCasaResponseDTO updateItemCasa(UUID id, ItemCasaRequestDTO dto) {
-        ItemCasa itemCasa = itemCasaRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Item inexistente"));
-        itemCasa.setNome(dto.getNome());
-        itemCasa.setPreco(dto.getPreco());
-        itemCasa.setTipo(dto.getTipo());
-        itemCasa.setNecessidade(dto.getNecessidade());
-        itemCasa.setComodo(dto.getComodo());
-        itemCasa.setFotoBase64(dto.getFotoBase64());
-        return converteParaResponse(itemCasaRepository.save(itemCasa));
+        Usuario usuario = authService.getUsuarioLogado();
+
+        ItemCasa item = itemCasaRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Item não encontrado"));
+
+        if (!item.getUsuario().getId().equals(usuario.getId())) {
+            throw new AccessDeniedException("Você não tem permissão para editar este item");
+        }
+
+        item.setNome(dto.getNome());
+        item.setPreco(dto.getPreco());
+        item.setTipo(dto.getTipo());
+        item.setNecessidade(dto.getNecessidade());
+        item.setComodo(dto.getComodo());
+        item.setFotoBase64(dto.getFotoBase64());
+
+        return converteParaResponse(itemCasaRepository.save(item));
     }
 
     @Transactional
-    public void deleteItemCasa(UUID id){
-        if(!itemCasaRepository.existsById(id)){
-            throw new ResourceNotFoundException("Nenhum Item encontrado com esse ID: "+ id);
+    public void deleteItemCasa(UUID id) {
+        Usuario usuario = authService.getUsuarioLogado();
+        ItemCasa item = itemCasaRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Item não encontrado"));
+
+        if (!item.getUsuario().getId().equals(usuario.getId())) {
+            throw new AccessDeniedException("Você não tem permissão para excluir este item");
         }
 
-        itemCasaRepository.deleteById(id);
+        itemCasaRepository.delete(item);
     }
 
-    @Transactional
-    public ItemCasaResponseDTO salvarFoto(UUID id, String fotoBase64){
-        ItemCasa itemCasa = itemCasaRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Produto inexistente"));
+    public List<ItemCasaResponseDTO> filtrar(
+            String nome, ComodoItem comodo, TipoItem tipo,
+            NecessidadeItem necessidade, BigDecimal precoMin, BigDecimal precoMax) {
 
-        if(fotoBase64 != null && fotoBase64.startsWith("data:image")){
-            itemCasa.setFotoBase64(fotoBase64);
-            itemCasaRepository.save(itemCasa);
-        } else{
-            throw new IllegalArgumentException("Formato de imagem invalido");
-        }
-        return converteParaResponse(itemCasaRepository.save(itemCasa));
+        Usuario usuario = authService.getUsuarioLogado();
+        Specification<ItemCasa> spec = Specification
+                .where(ItemCasaSpecification.pertenceAoUsuario(usuario.getId()))
+                .and(ItemCasaSpecification.porNome(nome))
+                .and(ItemCasaSpecification.porComodo(comodo))
+                .and(ItemCasaSpecification.porTipo(tipo))
+                .and(ItemCasaSpecification.porNecessidade(necessidade))
+                .and(ItemCasaSpecification.porPrecoMinimo(precoMin))
+                .and(ItemCasaSpecification.porPrecoMaximo(precoMax));
+
+        return itemCasaRepository.findAll(spec).stream()
+                .map(this::converteParaResponse)
+                .toList();
     }
 
-    private ItemCasaResponseDTO converteParaResponse(ItemCasa itemCasa){
+    private ItemCasaResponseDTO converteParaResponse(ItemCasa itemCasa) {
         return ItemCasaResponseDTO.builder()
                 .id(itemCasa.getId())
                 .nome(itemCasa.getNome())
@@ -99,28 +125,5 @@ public class ItemCasaService {
                 .comodo(itemCasa.getComodo())
                 .fotoBase64(itemCasa.getFotoBase64())
                 .build();
-    }
-
-
-    public List<ItemCasaResponseDTO> filtrar(
-            String nome,
-            ComodoItem comodo,
-            TipoItem tipo,
-            NecessidadeItem necessidade,
-            BigDecimal precoMin,
-            BigDecimal precoMax) {
-
-        Specification<ItemCasa> spec = Specification
-                .where(ItemCasaSpecification.porNome(nome))
-                .and(ItemCasaSpecification.porComodo(comodo))
-                .and(ItemCasaSpecification.porTipo(tipo))
-                .and(ItemCasaSpecification.porNecessidade(necessidade))
-                .and(ItemCasaSpecification.porPrecoMinimo(precoMin))
-                .and(ItemCasaSpecification.porPrecoMaximo(precoMax));
-
-        return itemCasaRepository.findAll(spec)
-                .stream()
-                .map(this::converteParaResponse)
-                .toList();
     }
 }

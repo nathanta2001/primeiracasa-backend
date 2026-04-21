@@ -5,6 +5,7 @@ import lombok.*;
 import org.nathan.primeiracasabackend.Enums.EnumsProduto.CategoriaProduto;
 import org.nathan.primeiracasabackend.Enums.EnumsProduto.StatusProduto;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.UUID;
 
@@ -18,7 +19,12 @@ import java.util.UUID;
 @EqualsAndHashCode(of = "id")
 public class Produto implements Serializable{
 
+    @Serial
     private static final long serialVersionUID = 1L;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "usuario_id", nullable = false)
+    private Usuario usuario;
 
     @ManyToOne
     @JoinColumn(name = "fk_lista", nullable = false)
