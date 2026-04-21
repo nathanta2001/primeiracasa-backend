@@ -8,8 +8,13 @@ import org.nathan.primeiracasabackend.dto.request.ProdutoRequestDTO;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 public class ItemCasaSpecification {
+
+    public static Specification<ItemCasa> pertenceAoUsuario(UUID usuarioId) {
+        return (root, query, cb) -> cb.equal(root.get("usuario").get("id"), usuarioId);
+    }
 
     public static Specification<ItemCasa> porNome(String nome) {
         return (root, query, cb) -> nome == null ? null :

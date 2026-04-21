@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.nathan.primeiracasabackend.Service.ProdutoService;
 import org.nathan.primeiracasabackend.dto.request.ProdutoRequestDTO;
@@ -16,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/produtos")
 @RequiredArgsConstructor
+@SecurityRequirement(name = "bearerAuth")
 public class ProdutoController {
 
     private final ProdutoService produtoService;
@@ -38,12 +40,6 @@ public class ProdutoController {
     @PutMapping("/{id}")
     public ResponseEntity<ProdutoResponseDTO> updateProduto(@PathVariable("id") UUID id, @RequestBody @Valid ProdutoRequestDTO produtoRequestDTO){
         return ResponseEntity.ok(produtoService.updateProduto(id, produtoRequestDTO));
-    }
-
-    @PatchMapping("/{id}/foto")
-    public ResponseEntity<ProdutoResponseDTO> atualizarFoto(@PathVariable UUID id, @RequestBody Map<String, String> payload) {
-        String foto = payload.get("foto");
-        return ResponseEntity.ok(produtoService.salvarFoto(id, foto));
     }
 
     @DeleteMapping("/{id}")

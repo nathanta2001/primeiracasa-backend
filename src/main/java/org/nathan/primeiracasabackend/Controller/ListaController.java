@@ -3,6 +3,7 @@ package org.nathan.primeiracasabackend.Controller;
 import java.util.List;
 import java.util.UUID;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.nathan.primeiracasabackend.Service.ListaService;
 import org.nathan.primeiracasabackend.dto.request.ListaRequestDTO;
@@ -15,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/listas")
 @RequiredArgsConstructor
+@SecurityRequirement(name = "bearerAuth")
 public class ListaController {
 
     private final ListaService listaService;
@@ -44,7 +46,5 @@ public class ListaController {
         listaService.deleteLista(id);
         return ResponseEntity.noContent().build();
     }
-
-
 
 }

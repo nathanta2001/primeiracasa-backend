@@ -6,6 +6,8 @@ import lombok.*;
 import org.nathan.primeiracasabackend.Enums.EnumsItemCasa.ComodoItem;
 import org.nathan.primeiracasabackend.Enums.EnumsItemCasa.NecessidadeItem;
 import org.nathan.primeiracasabackend.Enums.EnumsItemCasa.TipoItem;
+
+import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -20,7 +22,12 @@ import java.util.UUID;
 @EqualsAndHashCode(of = "id")
 public class ItemCasa implements Serializable{
 
+    @Serial
     private static final long serialVersionUID = 1L;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "usuario_id", nullable = false)
+    private Usuario usuario;
 
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
