@@ -10,7 +10,6 @@ import java.util.UUID;
 @Entity
 @Builder
 @Table(name = "usuarios")
-@Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id")
