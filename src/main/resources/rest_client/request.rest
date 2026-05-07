@@ -1,0 +1,85 @@
+# Configurações Globais
+@baseUrl = http://localhost:8080/api
+# @baseUrl = https://sua-api-no-render.onrender.com/api
+
+### 1. AUTENTICAÇÃO
+
+# @name register
+POST {{baseUrl}}/register
+Content-Type: application/json
+
+
+{
+  "nome": "Nathan Alves",
+  "email": "nathan@email.com",
+  "senha": "123456"
+}
+
+###
+@login = variable value
+
+# @name login
+POST {{baseUrl}}/login
+Content-Type: application/json
+
+
+{
+  "email": "nathan@email.com",
+  "senha": "123456"
+}
+
+
+@token = {{login.response.body.data.token}}
+
+### 2. ITENS DA CASA (Mobiliário/Eletros)
+
+# @name listarItens
+GET {{baseUrl}}/itens
+Authorization: Bearer {{token}}
+
+
+# @name criarItem
+POST {{baseUrl}}/itens
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "nome": "Geladeira Frost Free",
+  "preco": 3500.00,
+  "tipo": "ELETRODOMESTICO",
+  "necessidade": "ESSENCIAL",
+  "comodo": "COZINHA"
+}
+
+### 3. LISTAS DE COMPRAS
+
+# @name criarLista
+POST {{baseUrl}}/listas
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "nome": "Enxoval de Banho"
+}
+
+@idLista = {{criarLista.response.body.id}}
+
+### 4. PRODUTOS (Vinculados a Listas)
+
+# @name adicionarProdutoALista
+POST {{baseUrl}}/produtos
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "nome": "Toalha de Rosto",
+  "categoria": "CAMA_MESA_BANHO",
+  "status": "PENDENTE",
+  "idLista": "{{idLista}}"
+}
+
+###
+
+# @name filtrarItens
+GET {{baseUrl}}/itens/filtrar?comodo=COZINHA&necessidade=ESSENCIAL
+Authorization: Bearer {{token}}
