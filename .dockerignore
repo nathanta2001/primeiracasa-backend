@@ -1,0 +1,28 @@
+# Build do Java (Maven/Gradle)
+target/
+build/
+out/
+.gradle/
+.m2/
+
+# Configurações de Ambiente (Supabase/Segurança)
+.env
+.env.*
+.supabase/
+
+# Arquivos da IDE
+.idea/
+*.iml
+.vscode/
+.settings/
+.classpath
+.project
+
+# Logs e Temporários
+*.log
+tmp/
+temp/
+
+# Controle de Versão
+.git
+.gitignore
