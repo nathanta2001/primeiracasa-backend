@@ -18,6 +18,6 @@ public interface ProdutoRepository extends JpaRepository<Produto, UUID> {
     List<Produto> findByUsuarioId(UUID id);
     Optional<Produto> findByIdAndUsuarioId(UUID id, UUID usuarioId);
     List<Produto> findByCategoriaAndUsuarioId(CategoriaProduto categoria, UUID usuarioId);
-
+    List<Produto> findByListaId(UUID listaId);
     boolean existsByNomeContaining(String nome);
 }

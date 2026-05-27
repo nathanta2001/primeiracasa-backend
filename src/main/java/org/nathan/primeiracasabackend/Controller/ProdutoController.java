@@ -26,6 +26,11 @@ public class ProdutoController {
         return ResponseEntity.ok().body(produtoService.getProdutoList());
     }
 
+    @GetMapping("/por-lista/{listaId}")
+    public ResponseEntity<List<ProdutoResponseDTO>> getProdutosPorLista(@PathVariable UUID listaId) {
+        return ResponseEntity.ok(produtoService.getProdutosPorLista(listaId));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<ProdutoResponseDTO> getProdutoById(@PathVariable UUID id){
         return ResponseEntity.ok(produtoService.getProduto(id));

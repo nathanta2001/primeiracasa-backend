@@ -30,6 +30,14 @@ public class Lista implements Serializable {
     @OneToMany(mappedBy = "lista", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Produto> produtos = new ArrayList<>();
 
+    @ManyToMany
+    @JoinTable(
+            name = "lista_colaboradores",
+            joinColumns = @JoinColumn(name = "id_lista"),
+            inverseJoinColumns = @JoinColumn(name = "id_usuario")
+    )
+    private List<Usuario> colaboradores = new ArrayList<>();
+
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
     @Column(name = "id_lista")

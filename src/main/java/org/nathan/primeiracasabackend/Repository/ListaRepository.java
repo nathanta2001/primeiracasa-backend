@@ -14,4 +14,5 @@ import java.util.UUID;
 public interface ListaRepository extends JpaRepository<Lista, UUID> {
     List<Lista> findByUsuarioId(UUID usuarioId);
     Optional<Lista> findByIdAndUsuarioId(UUID id, UUID usuarioId);
+    List<Lista> findByColaboradoresId(UUID usuarioId);
 }

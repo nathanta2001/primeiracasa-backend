@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import org.nathan.primeiracasabackend.Exception.ResourceNotFoundException;
 import org.nathan.primeiracasabackend.Model.Usuario;
 import org.nathan.primeiracasabackend.Repository.ListaRepository;
+import org.nathan.primeiracasabackend.Repository.UsuarioRepository;
 import org.nathan.primeiracasabackend.dto.request.ListaRequestDTO;
 import org.nathan.primeiracasabackend.dto.response.ListaResponseDTO;
 
@@ -14,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -21,10 +23,19 @@ public class ListaService {
 
     private final ListaRepository listaRepository;
     private final AuthService authService;
+    private final UsuarioRepository usuarioRepository;
 
     public List<ListaResponseDTO> getListaList() {
-        return listaRepository.findByUsuarioId(authService.getUsuarioLogado().getId())
-                .stream()
+        Usuario usuario = authService.getUsuarioLogado();
+
+        // Busca listas criadas pelo usuário
+        List<Lista> criadas = listaRepository.findByUsuarioId(usuario.getId());
+
+        List<Lista> compartilhadas = listaRepository.findByColaboradoresId(usuario.getId());
+
+        // Mescla e converte para DTO
+        return Stream.concat(criadas.stream(), compartilhadas.stream())
+                .distinct()
                 .map(this::converteParaResponse)
                 .toList();
     }
@@ -38,6 +49,30 @@ public class ListaService {
         }
 
         return converteParaResponse(lista);
+    }
+
+    @Transactional
+    public void compartilharComUsuario(UUID idLista, String emailConvidado) {
+        Usuario dono = authService.getUsuarioLogado();
+        Lista lista = listaRepository.findById(idLista)
+                .orElseThrow(() -> new ResourceNotFoundException("Lista não encontrada"));
+
+        // Apenas o dono original pode compartilhar a lista com novas pessoas
+        if (!lista.getUsuario().getId().equals(dono.getId())) {
+            throw new AccessDeniedException("Apenas o proprietário pode compartilhar esta lista.");
+        }
+
+        if (dono.getEmail().equalsIgnoreCase(emailConvidado)) {
+            throw new IllegalArgumentException("Você não pode compartilhar a lista com você mesmo.");
+        }
+
+        Usuario colaborador = usuarioRepository.findByEmail(emailConvidado)
+                .orElseThrow(() -> new ResourceNotFoundException("Nenhum usuário cadastrado com o e-mail: " + emailConvidado));
+
+        if (!lista.getColaboradores().contains(colaborador)) {
+            lista.getColaboradores().add(colaborador);
+            listaRepository.save(lista);
+        }
     }
 
     @Transactional
