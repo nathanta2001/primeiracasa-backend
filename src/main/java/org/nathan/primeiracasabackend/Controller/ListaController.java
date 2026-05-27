@@ -6,6 +6,7 @@ import java.util.UUID;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.nathan.primeiracasabackend.Service.ListaService;
+import org.nathan.primeiracasabackend.dto.request.CompartilharListaRequestDTO;
 import org.nathan.primeiracasabackend.dto.request.ListaRequestDTO;
 import org.nathan.primeiracasabackend.dto.response.ListaResponseDTO;
 import org.springframework.http.HttpStatus;
@@ -39,6 +40,14 @@ public class ListaController {
     @PutMapping("/{id}")
     public ResponseEntity<ListaResponseDTO> updateLista(@PathVariable UUID id, @RequestBody @Valid ListaRequestDTO listaRequestDTO){
         return ResponseEntity.ok(listaService.updateLista(id, listaRequestDTO));
+    }
+
+    @PostMapping("/{id}/compartilhar")
+    public ResponseEntity<String> compartilharLista(
+            @PathVariable UUID id,
+            @RequestBody @Valid CompartilharListaRequestDTO dto) {
+        listaService.compartilharComUsuario(id, dto.getEmail());
+        return ResponseEntity.ok("Lista compartilhada com sucesso!");
     }
 
     @DeleteMapping("/{id}")
